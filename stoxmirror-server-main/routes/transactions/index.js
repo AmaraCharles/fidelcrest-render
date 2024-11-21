@@ -258,14 +258,17 @@ router.put("/:_id/transactions/:transactionId/confirm", async (req, res) => {
 
     return;
   }
-
+  
   try {
+    
     const depositsArray = user.transactions;
     const depositsTx = depositsArray.filter(
       (tx) => tx._id === transactionId
+       
     );
 
     depositsTx[0].status = "Approved";
+    const newBalances=depositsTx[0].amount;
     // console.log(withdrawalTx);
 
     // const cummulativeWithdrawalTx = Object.assign({}, ...user.withdrawals, withdrawalTx[0])
@@ -276,6 +279,7 @@ router.put("/:_id/transactions/:transactionId/confirm", async (req, res) => {
         ...user.transactions
         //cummulativeWithdrawalTx
       ],
+      balance:newBalances,
     });
 
     res.status(200).json({
