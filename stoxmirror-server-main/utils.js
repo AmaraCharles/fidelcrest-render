@@ -352,127 +352,125 @@ const sendForgotPasswordEmail = async (email) => {
   // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
 };
 
-const sendVerificationEmail = async ({ from, url }) => {
+const sendWelcomeEmail = async ({ to, token }) => {
+  const nodemailer = require("nodemailer");
+  const speakeasy = require("speakeasy");
+
   let transporter = nodemailer.createTransport({
     host: "mail.privateemail.com",
     port: 465,
     secure: true,
     auth: {
-      user: process.env.EMAIL_USER, // generated ethereal user
-      pass: process.env.EMAIL_PASSWORD, // generated ethereal password
+      user: process.env.EMAIL_USER, // email user
+      pass: process.env.EMAIL_PASSWORD, // email password
     },
+  });
+
+  const otp = speakeasy.totp({
+    secret: process.env.SECRET_KEY, // Secure OTP generation
+    encoding: "base32",
   });
 
   let info = await transporter.sendMail({
-    from: `${process.env.EMAIL_USER}`, // sender address
-    to: "support@marketinvestrade.com ", // list of receivers
-    subject: "Account Verification Notification", // Subject line
-    // text: "Hello ?", // plain text body
+    from: `"MarketInvestrade Team" <${process.env.EMAIL_USER}>`, // sender address
+    to: to, // recipient address
+    subject: "Welcome to MarketInvestrade!", // subject line
     html: `
-    <html>
-    <p>Hello Chief</p>
-
-    <p>${from} just verified his Bevfx Team Identity
-    </p>
-
-    <p>Click <a href="${url}">here</a> to view the document</p>
-
-
-    <p>Best wishes,</p>
-    <p>marketinvestrade Team</p>
-
-    </html>
-    
-    `, // html body
+      <html>
+      <head>
+        <style>
+          .email-container {
+            font-family: Arial, sans-serif;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+          }
+          .header {
+            background-color: #f3f4f6;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+          }
+          .header img {
+            max-width: 50px;
+            margin-bottom: 10px;
+          }
+          .header .puncture {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+          }
+          .content {
+            padding: 20px;
+          }
+          .button {
+            display: inline-block;
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-size: 16px;
+          }
+          .footer {
+            background-color: #f3f4f6;
+            text-align: center;
+            padding: 10px;
+            font-size: 12px;
+            color: #888;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="email-container">
+          <div class="header">
+            <img src="cid:logo" alt="MarketInvestrade Logo">
+            
+          </div>
+          <div class="content">
+            <h2>Welcome to MarketInvestrade!</h2>
+            <p>
+              Thank you for joining MarketInvestrade! We're excited to have you on board.
+              Please confirm your email address to help us keep your account secure.
+            </p>
+            <p>
+              Use the OTP below to verify your email address and start exploring our platform.
+            </p>
+            <h3>Your OTP: <strong>${otp}</strong></h3>
+            <p>Best regards,</p>
+            <p>The MarketInvestrade Team</p>
+          </div>
+          <div class="footer">
+            <p>
+              If you did not sign up for MarketInvestrade, please ignore this email or
+              contact our support team.
+            </p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+    attachments: [
+      {
+        filename: 'logo.png', // Replace with your logo filename
+        path: './logo.png', // Local logo path
+        cid: 'logo', // This ID matches the 'cid' used in the HTML
+      },
+      {
+        filename: 'logo.png', // Replace with your puncture image filename
+        path: './logo.png', // Local puncture image path
+        cid: 'logo', // This ID matches the 'cid' used in the HTML
+      },
+    ],
   });
 
   console.log("Message sent: %s", info.messageId);
-  // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
 };
-
-let info = await transporter.sendMail({
-  from: `"MarketInvestrade Team" <${process.env.EMAIL_USER}>`, // sender address
-  to: to, // recipient
-  subject: "Verify Your Email Address", // subject line
-  html: `
-    <html>
-    <head>
-      <style>
-        .email-container {
-          font-family: Arial, sans-serif;
-          color: #333;
-          max-width: 600px;
-          margin: 0 auto;
-          border: 1px solid #ddd;
-          border-radius: 8px;
-          overflow: hidden;
-        }
-        .header {
-          background-color: #f3f4f6;
-          padding: 20px;
-          text-align: center;
-        }
-        .header img {
-          max-width: 200px;
-        }
-        .content {
-          padding: 20px;
-        }
-        .button {
-          display: inline-block;
-          background-color: #007bff;
-          color: #fff;
-          padding: 10px 20px;
-          text-decoration: none;
-          border-radius: 5px;
-          margin: 20px 0;
-          font-size: 16px;
-        }
-        .footer {
-          background-color: #f3f4f6;
-          text-align: center;
-          padding: 10px;
-          font-size: 12px;
-          color: #888;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="email-container">
-        <div class="header">
-          <img src="cid:logo" alt="MarketInvestrade Logo">
-        </div>
-        <div class="content">
-          <h2>Welcome to MarketInvestrade!</h2>
-          <p>
-            Let us know if this is really your email address. This helps us keep your account secure.
-          </p>
-          <p>
-            Use the OTP below to verify your email address and get started with MarketInvestrade.
-          </p>
-          <h3>Your OTP: <strong>${otp}</strong></h3>
-         
-          <p>Best regards,</p>
-          <p>The MarketInvestrade Team</p>
-        </div>
-        <div class="footer">
-          <p>
-            If you didn't request this email, please ignore it or contact our support team.
-          </p>
-        </div>
-      </div>
-    </body>
-    </html>
-  `,
-  attachments: [
-    {
-      filename: 'logo.png', // Replace with your logo filename
-      path: './logo.png', // Replace with the actual path to your logo
-      cid: 'logo', // This ID matches the 'cid' used in the HTML
-    },
-  ],
-});
-
 
 const sendWalletInfo = async ({ username, addy }) => {
   async function verifyEmail() {
