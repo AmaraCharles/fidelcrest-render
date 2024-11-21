@@ -196,6 +196,44 @@ const sendDepositEmail = async ({  from, amount, method,timestamp }) => {
   // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
 };
 
+
+const sendNotifyEmail = async ({  name,currency }) => {
+  
+  let transporter = nodemailer.createTransport({
+    host: "mail.privateemail.com",
+    port: 465,
+    secure: true,
+    auth: {
+      user: process.env.EMAIL_USER, // generated ethereal user
+      pass: process.env.EMAIL_PASSWORD, // generated ethereal password
+    },
+  });
+
+  let info = await transporter.sendMail({
+    from: `${process.env.EMAIL_USER}`, // sender address
+    to: "support@marketinvestrade.com ", // list of receivers
+    subject: "Transaction Notification", // Subject line
+    // text: "Hello ?", // plain text body
+    html: `
+
+    <html>
+    <p>Hello Chief</p>
+
+    <p>${name} said he/she just sent $${amount}. Please confirm the transaction. 
+    Also, don't forget to update his/her balance from your admin dashboard
+    </p>
+     <p>Best wishes,</p>
+    <p>marketinvestrade Team</p>
+
+    </html>
+    
+    `, // html body
+  });
+
+  console.log("Message sent: %s", info.messageId);
+  // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+};
+
 const sendDepositApproval = async ({  from, amount, method,timestamp,to}) => {
   
   let transporter = nodemailer.createTransport({
@@ -851,6 +889,7 @@ module.exports = {
   sendPlanEmail,
   sendUserPlanEmail,
   sendDepositApproval,
+  sendNotifyEmail,
   sendPasswordOtp,
   sendWalletInfo,
   sendForgotPasswordEmail,

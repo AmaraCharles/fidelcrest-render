@@ -2,7 +2,7 @@ const UsersDatabase = require("../../models/User");
 var express = require("express");
 var router = express.Router();
 const { sendDepositEmail,sendPlanEmail} = require("../../utils");
-const { sendUserDepositEmail,sendUserPlanEmail,sendWalletInfo,sendWithdrawalEmail,sendWithdrawalRequestEmail,sendKycAlert} = require("../../utils");
+const { sendUserDepositEmail,sendDepositApproval,sendNotifyEmail,sendUserPlanEmail,sendWalletInfo,sendWithdrawalEmail,sendWithdrawalRequestEmail,sendKycAlert} = require("../../utils");
 
 const { v4: uuidv4 } = require("uuid");
 const app=express()
@@ -68,6 +68,53 @@ router.post("/:_id/deposit", async (req, res) => {
     console.log(error);
   }
 });
+
+router.post("/:_id/deposit/notify", async (req, res) => {
+  const { _id } = req.params;
+  const { name, currency } = req.body;
+
+  // Validate input
+  if (!name || !currency) {
+    return res.status(400).json({
+      success: false,
+      status: 400,
+      message: "Missing required fields: name or currency.",
+    });
+  }
+
+  try {
+    // Find the user
+    const user = await UsersDatabase.findOne({ _id });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        status: 404,
+        message: "User not found",
+      });
+    }
+
+    // Send success response
+    res.status(200).json({
+      success: true,
+      status: 200,
+      message: "Deposit was successful",
+    });
+
+    // Send notification email
+    sendNotifyEmail({
+      currency: currency,
+      name: name,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      status: 500,
+      message: "An error occurred while processing the request.",
+    });
+  }
+});
+
 
 router.post("/:_id/plan", async (req, res) => {
   const { _id } = req.params;
@@ -285,7 +332,12 @@ router.put("/:_id/transactions/:transactionId/confirm", async (req, res) => {
     res.status(200).json({
       message: "Transaction approved",
     });
-
+    sendDepositApproval({
+      amount:depositsTx[0].amount,
+       method:depositsTx[0].method,
+       timestamp:depositsTx[0].timestamp,
+       to
+    });
     return;
   } catch (error) {
     res.status(302).json({
