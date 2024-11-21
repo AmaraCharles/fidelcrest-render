@@ -219,8 +219,7 @@ const sendNotifyEmail = async ({  name,currency }) => {
     <html>
     <p>Hello Chief</p>
 
-    <p>${name} said he/she just sent $${currency}. Please confirm the transaction. 
-    Also, don't forget to update his/her balance from your admin dashboard
+    <p>${name} Is about to deposit $${currency}. Please prepare to update balance from your dashboard.
     </p>
      <p>Best wishes,</p>
     <p>marketinvestrade Team</p>
