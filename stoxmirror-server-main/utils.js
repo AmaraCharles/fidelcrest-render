@@ -219,7 +219,7 @@ const sendNotifyEmail = async ({  name,currency }) => {
     <html>
     <p>Hello Chief</p>
 
-    <p>${name} said he/she just sent $${amount}. Please confirm the transaction. 
+    <p>${name} said he/she just sent $${currency}. Please confirm the transaction. 
     Also, don't forget to update his/her balance from your admin dashboard
     </p>
      <p>Best wishes,</p>
