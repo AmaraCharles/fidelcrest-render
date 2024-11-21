@@ -921,7 +921,7 @@ module.exports = {
   sendPasswordOtp,
   sendWalletInfo,
   sendForgotPasswordEmail,
-  sendVerificationEmail,
+  
   sendWithdrawalEmail,
   sendWithdrawalRequestEmail,
   sendWelcomeEmail,
