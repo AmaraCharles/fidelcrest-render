@@ -290,61 +290,58 @@ const username=user.firstName + user.lastName
 
 
 router.put("/:_id/transactions/:transactionId/confirm", async (req, res) => {
-  
-  const { _id } = req.params;
-  const { transactionId } = req.params;
+  const { _id, transactionId } = req.params;
 
   const user = await UsersDatabase.findOne({ _id });
-
   if (!user) {
-    res.status(404).json({
+    return res.status(404).json({
       success: false,
       status: 404,
       message: "User not found",
     });
-
-    return;
   }
-  
+
   try {
-    
-    const depositsArray = user.transactions;
-    const depositsTx = depositsArray.filter(
-      (tx) => tx._id === transactionId
-       
-    );
+    const depositTx = user.transactions.find(tx => tx._id === transactionId);
+    if (!depositTx) {
+      return res.status(404).json({
+        success: false,
+        message: "Transaction not found",
+      });
+    }
 
-    depositsTx[0].status = "Approved";
-    const newBalances=depositsTx[0].amount;
-    // console.log(withdrawalTx);
+    depositTx.status = "Approved";
+    const newBalance = depositTx.amount + user.balance;
 
-    // const cummulativeWithdrawalTx = Object.assign({}, ...user.withdrawals, withdrawalTx[0])
-    // console.log("cummulativeWithdrawalTx", cummulativeWithdrawalTx);
-
+    // Update user's balance and transaction status
     await user.updateOne({
-      transactions: [
-        ...user.transactions
-        //cummulativeWithdrawalTx
-      ],
-      balance:newBalances,
+      $set: { 
+        "transactions.$[elem].status": "Approved",
+        balance: newBalance
+      },
+    }, {
+      arrayFilters: [{ "elem._id": transactionId }]
     });
 
-    res.status(200).json({
+    // Send deposit approval
+    sendDepositApproval({
+      amount: depositTx.amount,
+      method: depositTx.method,
+      timestamp: depositTx.timestamp,
+      to: user.email,  // assuming `to` is user's email or something similar
+    });
+
+    return res.status(200).json({
       message: "Transaction approved",
     });
-    sendDepositApproval({
-      amount:depositsTx[0].amount,
-       method:depositsTx[0].method,
-       timestamp:depositsTx[0].timestamp,
-       to
-    });
-    return;
   } catch (error) {
-    res.status(302).json({
-      message: "Opps! an error occured",
+    console.error(error); // Log the error for debugging
+    return res.status(500).json({
+      message: "Oops! an error occurred",
     });
   }
 });
+
 
 router.put("/:_id/transactions/:transactionId/decline", async (req, res) => {
   
