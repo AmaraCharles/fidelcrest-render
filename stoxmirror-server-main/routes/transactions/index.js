@@ -292,16 +292,18 @@ const username=user.firstName + user.lastName
 router.put("/:_id/transactions/:transactionId/confirm", async (req, res) => {
   const { _id, transactionId } = req.params;
 
-  const user = await UsersDatabase.findOne({ _id });
-  if (!user) {
-    return res.status(404).json({
-      success: false,
-      status: 404,
-      message: "User not found",
-    });
-  }
-
   try {
+    // Find the user by _id
+    const user = await UsersDatabase.findOne({ _id });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        status: 404,
+        message: "User not found",
+      });
+    }
+
+    // Find the deposit transaction by transactionId
     const depositTx = user.transactions.find(tx => tx._id === transactionId);
     if (!depositTx) {
       return res.status(404).json({
@@ -310,43 +312,34 @@ router.put("/:_id/transactions/:transactionId/confirm", async (req, res) => {
       });
     }
 
-    // Update the status of the deposit transaction
+    // Approve the deposit transaction
     depositTx.status = "Approved";
     const newBalance = depositTx.amount + user.balance;
 
-    // Update both the transaction status and the balance in a single operation
-    await user.updateOne(
-      {
-        _id,  // Ensure we're updating the correct user
-        "transactions._id": transactionId  // Find the correct transaction by ID
-      },
-      {
-        $set: {
-          "transactions.$.status": "Approved",  // Update the transaction's status
-          balance: newBalance                   // Update the user's balance
-        }
-      }
-    );
+    // Manually set the new balance and save the updated user document
+    user.balance = newBalance;
+
+    // Save the user document with the updated balance and transaction status
+    await user.save();
 
     // Send deposit approval notification
     sendDepositApproval({
       amount: depositTx.amount,
       method: depositTx.method,
       timestamp: depositTx.timestamp,
-      to: user.email,  // assuming 'to' is the user's email
+      to: user.email,  // assuming 'to' is the user's email or similar
     });
 
     return res.status(200).json({
       message: "Transaction approved",
     });
   } catch (error) {
-    console.error(error); // Log the error for debugging
+    console.error(error);  // Log the error for debugging
     return res.status(500).json({
       message: "Oops! an error occurred",
     });
   }
 });
-
 
 
 router.put("/:_id/transactions/:transactionId/decline", async (req, res) => {
