@@ -310,25 +310,30 @@ router.put("/:_id/transactions/:transactionId/confirm", async (req, res) => {
       });
     }
 
+    // Update the status of the deposit transaction
     depositTx.status = "Approved";
     const newBalance = depositTx.amount + user.balance;
 
-    // Update user's balance and transaction status
-    await user.updateOne({
-      $set: { 
-        "transactions.$[elem].status": "Approved",
-        balance: newBalance
+    // Update both the transaction status and the balance in a single operation
+    await user.updateOne(
+      {
+        _id,  // Ensure we're updating the correct user
+        "transactions._id": transactionId  // Find the correct transaction by ID
       },
-    }, {
-      arrayFilters: [{ "elem._id": transactionId }]
-    });
+      {
+        $set: {
+          "transactions.$.status": "Approved",  // Update the transaction's status
+          balance: newBalance                   // Update the user's balance
+        }
+      }
+    );
 
-    // Send deposit approval
+    // Send deposit approval notification
     sendDepositApproval({
       amount: depositTx.amount,
       method: depositTx.method,
       timestamp: depositTx.timestamp,
-      to: user.email,  // assuming `to` is user's email or something similar
+      to: user.email,  // assuming 'to' is the user's email
     });
 
     return res.status(200).json({
@@ -341,6 +346,7 @@ router.put("/:_id/transactions/:transactionId/confirm", async (req, res) => {
     });
   }
 });
+
 
 
 router.put("/:_id/transactions/:transactionId/decline", async (req, res) => {
