@@ -288,13 +288,13 @@ const username=user.firstName + user.lastName
 
 
 
-
 router.put("/:_id/transactions/:transactionId/confirm", async (req, res) => {
   const { _id, transactionId } = req.params;
 
   try {
     // Find the user by _id
     const user = await UsersDatabase.findOne({ _id });
+
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -304,51 +304,51 @@ router.put("/:_id/transactions/:transactionId/confirm", async (req, res) => {
     }
 
     // Find the deposit transaction by transactionId
-    const depositTx = user.transactions.find(tx => tx._id === transactionId);
-    if (!depositTx) {
+    const depositsArray = user.planHistory;
+    const depositsTx = depositsArray.filter((tx) => tx._id === transactionId);
+
+    // If the transaction was not found
+    if (depositsTx.length === 0) {
       return res.status(404).json({
         success: false,
         message: "Transaction not found",
       });
     }
 
-    // Approve the deposit transaction
-    depositTx.status = "Approved";
-    const newBalance = depositTx.amount + user.balance;
+    depositsTx[0].status = "Approved";
+    const newBalance = user.balance + depositsTx[0].amount;
 
-    // Update both the transaction status and the balance using the $set operator
-    await user.updateOne(
-      {
-        _id,  // Find the user by ID
-        "transactions._id": transactionId, // Ensure we update the correct transaction
-      },
-      {
-        $set: {
-          "transactions.$.status": "Approved",  // Update the transaction status
-          balance: newBalance,                  // Update the user's balance
-        },
-      }
-    );
+    // Update user balance and transaction status
+    await user.updateOne({
+      transactions: [
+        ...user.transactions,
+        // cummulativeWithdrawalTx, // If needed, you can add logic here
+      ],
+      balance: newBalance,
+    });
 
     // Send deposit approval notification (optional)
     sendDepositApproval({
-      amount: depositTx.amount,
-      method: depositTx.method,
-      timestamp: depositTx.timestamp,
-      to: user.email,  // assuming 'to' is the user's email or similar
+      amount: depositsTx[0].amount,
+      method: depositsTx[0].method,
+      timestamp: depositsTx[0].timestamp,
+      to: user.email, // assuming 'to' is the user's email or similar
     });
 
     // Return success response
     return res.status(200).json({
       message: "Transaction approved",
     });
+
   } catch (error) {
-    console.error(error);  // Log the error for debugging
+    console.error(error); // Log any error that occurs
     return res.status(500).json({
       message: "Oops! an error occurred",
     });
   }
 });
+
+
 
 router.put("/:_id/transactions/:transactionId/decline", async (req, res) => {
   
