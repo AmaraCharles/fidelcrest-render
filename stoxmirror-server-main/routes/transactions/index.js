@@ -316,13 +316,21 @@ router.put("/:_id/transactions/:transactionId/confirm", async (req, res) => {
     depositTx.status = "Approved";
     const newBalance = depositTx.amount + user.balance;
 
-    // Manually set the new balance and save the updated user document
-    user.balance = newBalance;
+    // Update both the transaction status and the balance using the $set operator
+    await user.updateOne(
+      {
+        _id,  // Find the user by ID
+        "transactions._id": transactionId, // Ensure we update the correct transaction
+      },
+      {
+        $set: {
+          "transactions.$.status": "Approved",  // Update the transaction status
+          balance: newBalance,                  // Update the user's balance
+        },
+      }
+    );
 
-    // Save the user document with the updated balance and transaction status
-    await user.save();
-
-    // Send deposit approval notification
+    // Send deposit approval notification (optional)
     sendDepositApproval({
       amount: depositTx.amount,
       method: depositTx.method,
@@ -330,6 +338,7 @@ router.put("/:_id/transactions/:transactionId/confirm", async (req, res) => {
       to: user.email,  // assuming 'to' is the user's email or similar
     });
 
+    // Return success response
     return res.status(200).json({
       message: "Transaction approved",
     });
@@ -340,7 +349,6 @@ router.put("/:_id/transactions/:transactionId/confirm", async (req, res) => {
     });
   }
 });
-
 
 router.put("/:_id/transactions/:transactionId/decline", async (req, res) => {
   
