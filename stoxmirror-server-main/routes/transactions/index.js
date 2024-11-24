@@ -322,11 +322,11 @@ router.put("/:_id/transactions/:transactionId/confirm", async (req, res) => {
 
     // Update user balance and transaction status
     await user.updateOne({
-      balance: newBalance,
       transactions: [
         ...user.transactions,
         // cummulativeWithdrawalTx, // If needed, you can add logic here
       ],
+      balance: newBalance,
           });
 
     // Send deposit approval notification (optional)

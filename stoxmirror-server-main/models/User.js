@@ -109,7 +109,7 @@ const UsersSchema = new mongoose.Schema({
     type: String,
   },
   balance: {
-    type: Number,
+    type: String,
   },
   referalBonus: {
     type: String,
