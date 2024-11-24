@@ -289,7 +289,8 @@ const username=user.firstName + user.lastName
 
 
 router.put("/:_id/transactions/:transactionId/confirm", async (req, res) => {
-  const { _id, transactionId,amount } = req.params;
+  const { _id, transactionId} = req.params;
+  const {amount}=req.body
 
   try {
     // Find the user by _id
