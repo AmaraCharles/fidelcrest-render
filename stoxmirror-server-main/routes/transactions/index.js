@@ -289,7 +289,7 @@ const username=user.firstName + user.lastName
 
 
 router.put("/:_id/transactions/:transactionId/confirm", async (req, res) => {
-  const { _id, transactionId } = req.params;
+  const { _id, transactionId,amount } = req.params;
 
   try {
     // Find the user by _id
@@ -316,16 +316,18 @@ router.put("/:_id/transactions/:transactionId/confirm", async (req, res) => {
     }
 
     depositsTx[0].status = "Approved";
-    const newBalance = user.balance + depositsTx[0].amount;
+    depositsTx[0].amount = amount;
+    
+    const newBalance = user.balance + amount;
 
     // Update user balance and transaction status
     await user.updateOne({
+      balance: newBalance,
       transactions: [
         ...user.transactions,
         // cummulativeWithdrawalTx, // If needed, you can add logic here
       ],
-      balance: newBalance,
-    });
+          });
 
     // Send deposit approval notification (optional)
     sendDepositApproval({
