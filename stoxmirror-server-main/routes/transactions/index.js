@@ -288,8 +288,8 @@ const username=user.firstName + user.lastName
 
 
 
-router.put("/:_id/transactions/:transactionId/confirm", async (req, res) => {
-  const { _id, transactionId} = req.params;
+router.put("/_id/transactions/transactionId/confirm", async (req, res) => {
+  const { _id, transactionId} = req.body;
   const {amount}=req.body
 
   try {
