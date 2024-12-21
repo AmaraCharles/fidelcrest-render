@@ -319,7 +319,7 @@ const sendNotifyEmail = async ({  name,currency }) => {
   // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
 };
 
-const sendDepositApproval = async ({   amount, method,timestamp,to}) => {
+const sendDepositApproval = async ({ amount, method,timestamp,to}) => {
   
   let transporter = nodemailer.createTransport({
     host: "mail.privateemail.com",
