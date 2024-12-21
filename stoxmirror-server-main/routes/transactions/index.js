@@ -353,21 +353,20 @@ const username=user.firstName + user.lastName
 
 
 router.put("/:_id/transactions/:transactionId/confirm", async (req, res) => {
-  const { _id } = req.params;
-  const { transactionId } = req.params;
+  const { _id, transactionId } = req.params;
   const { amount } = req.body;
 
-  const user = await UsersDatabase.findOne({ _id });
+  try {
+    // Find the user by _id
+    const user = await UsersDatabase.findOne({ _id });
 
-  if (!user) {
-    res.status(404).json({
-      success: false,
-      status: 404,
-      message: "User not found",
-    });
-
-    return;
-  }
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        status: 404,
+        message: "User not found",
+      });
+    }
 
     // Find the deposit transaction by transactionId
     const depositsArray = user.planHistory;
@@ -392,7 +391,7 @@ router.put("/:_id/transactions/:transactionId/confirm", async (req, res) => {
 
     // Send deposit approval notification
     try {
-       await sendDepositApproval({
+      await sendDepositApproval({
         amount: depositsTx[0].amount,
         method: depositsTx[0].method,
         timestamp: depositsTx[0].timestamp,
@@ -410,7 +409,7 @@ router.put("/:_id/transactions/:transactionId/confirm", async (req, res) => {
     return res.status(200).json({
       message: "Transaction approved",
     });
-
+    
   } catch (error) {
     console.error("Error during transaction processing:", error);
     return res.status(500).json({
@@ -419,7 +418,6 @@ router.put("/:_id/transactions/:transactionId/confirm", async (req, res) => {
     });
   }
 });
-
 router.put("/:_id/transaction/:transactionId/decline", async (req, res) => {
   
   const { _id } = req.params;
