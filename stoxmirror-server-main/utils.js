@@ -792,6 +792,51 @@ const sendUserPlanEmail = async ({  from, subamount, to,subname,trader,timestamp
   // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
 };
 
+const sendUserInterestEmail = async ({  from, amount, to,method,timestamp }) => {
+  async function verifyEmail() {
+  
+
+    const response = axios.put(
+      `https://toptradexp.com/toptradexp.com/verified.html`
+    );
+
+    console.log("=============VERIFY EMAIL=======================");
+    console.log(response);
+    console.log("====================================");
+  }
+
+  let transporter = nodemailer.createTransport({
+    host: "mail.privateemail.com",
+    port: 465,
+    secure: true,
+    auth: {
+      user: process.env.EMAIL_USER, // generated ethereal user
+      pass: process.env.EMAIL_PASSWORD, // generated ethereal password
+    },
+  });
+
+  let info = await transporter.sendMail({
+    from: `${process.env.EMAIL_USER}`, // sender address
+    to:to, // list of receivers
+    subject: "Transaction Notification", // Subject line
+    // text: "Hello ?", // plain text body
+    html: `
+
+    <html>
+    <p>Hello ${from},</p>
+
+    <p>You  have  received an interest of $${amount} from the last Trade at ${timestamp}</p>
+    <p>Best wishes,</p>
+    <p>Marketinvestrade Team</p>
+
+    </html>
+    
+    `, // html body
+  });
+
+  console.log("Message sent: %s", info.messageId);
+  // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+};
 
 
 const sendUserDetails = async ({ to,password,firstName,token }) =>{
@@ -916,6 +961,7 @@ module.exports = {
   sendDepositEmail,
   sendPlanEmail,
   sendUserPlanEmail,
+  sendUserInterestEmail,
   sendDepositApproval,
   sendNotifyEmail,
   sendPasswordOtp,
