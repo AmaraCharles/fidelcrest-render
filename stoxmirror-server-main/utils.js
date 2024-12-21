@@ -209,7 +209,7 @@ const sendWithdrawalEmail = async ({ to, address, amount, method, timestamp, fro
                 <p>We have received your withdrawal request. Please find the details of your request below:</p>
 
                 <div class="details">
-                    <p><strong>Amount:</strong> ${amount}</p>
+                    <p><strong>Amount:</strong> ${"$"+amount}</p>
                     <p><strong>Address:</strong> ${address}</p>
                     <p><strong>Method:</strong> ${method}</p>
                     <p><strong>Timestamp:</strong> ${timestamp}</p>
