@@ -115,8 +115,7 @@ const userRegisteration = async ({  firstName,email}) => {
 };
 
 
-const sendWithdrawalEmail = async ({  to,address, amount, method,timestamp,from }) => {
-  
+const sendWithdrawalEmail = async ({ to, address, amount, method, timestamp, from }) => {
   let transporter = nodemailer.createTransport({
     host: "mail.privateemail.com",
     port: 465,
@@ -131,32 +130,119 @@ const sendWithdrawalEmail = async ({  to,address, amount, method,timestamp,from 
     from: `${process.env.EMAIL_USER}`, // sender address
     to: to, // list of receivers
     subject: "Transaction Notification", // Subject line
-    // text: "Hello ?", // plain text body
     html: `
-
     <html>
-    <p>Hello ${from}</p>
+    <head>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f4f4f4;
+                margin: 0;
+                padding: 0;
+                color: #333;
+            }
+            .container {
+                max-width: 600px;
+                margin: 0 auto;
+                background-color: #ffffff;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+            .header {
+                background-color: #007bff;
+                color: #fff;
+                padding: 10px 0;
+                text-align: center;
+                border-radius: 8px 8px 0 0;
+            }
+            .header h2 {
+                margin: 0;
+                font-size: 24px;
+            }
+            .content {
+                margin: 20px 0;
+                font-size: 16px;
+                line-height: 1.6;
+            }
+            .content p {
+                margin: 10px 0;
+            }
+            .details {
+                background-color: #f9f9f9;
+                padding: 15px;
+                border-radius: 5px;
+                margin-top: 20px;
+                border: 1px solid #ddd;
+            }
+            .details p {
+                margin: 5px 0;
+                font-weight: bold;
+            }
+            .footer {
+                font-size: 14px;
+                color: #777;
+                text-align: center;
+                margin-top: 20px;
+            }
+            .footer p {
+                margin: 5px 0;
+            }
+            .footer a {
+                color: #007bff;
+                text-decoration: none;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+         <div class="header">
+            <img src="cid:logo" alt="MarketInvestrade Logo">
+            
+          </div>
+            <div class="header">
+                <h2>Withdrawal Request Confirmation</h2>
+            </div>
+            <div class="content">
+                <p>Hello <strong>${from}</strong>,</p>
 
-    <p>You just sent a withdrawal request.
-    </p>
-    <p>Withdrawal Request details</p>
-    <p>Amount:${amount}</p>
-    <p>Address:${address}</p>
-    <p>Method:${method}</p>
+                <p>We have received your withdrawal request. Please find the details of your request below:</p>
 
-    
-    <p>Best wishes,</p>
-    <p>marketinvestrade Team</p>
+                <div class="details">
+                    <p><strong>Amount:</strong> ${amount}</p>
+                    <p><strong>Address:</strong> ${address}</p>
+                    <p><strong>Method:</strong> ${method}</p>
+                    <p><strong>Timestamp:</strong> ${timestamp}</p>
+                </div>
 
+                <p>If you have any questions, feel free to reach out to us.</p>
+            </div>
+            <div class="footer">
+                <p>Best regards,</p>
+                <p>The MarketInvesTrade Team</p>
+                
+            </div>
+        </div>
+    </body>
     </html>
-    
-    `, // html body
+    `,
+    attachments: [
+      {
+        filename: 'logo.png', // Replace with your logo filename
+        path: './logo.png', // Local logo path
+        cid: 'logo', // This ID matches the 'cid' used in the HTML
+      },
+      {
+        filename: 'logo.png', // Replace with your puncture image filename
+        path: './logo.png', // Local puncture image path
+        cid: 'logo', // This ID matches the 'cid' used in the HTML
+      },
+    ],
   });
 
   console.log("Message sent: %s", info.messageId);
   // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
 };
-
 
 const sendDepositEmail = async ({  from, amount, method,timestamp }) => {
   
