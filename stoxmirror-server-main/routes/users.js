@@ -63,7 +63,7 @@ router.put("/:_id/profile/update", async function (req, res, next) {
 
 router.post("/:_id/profile/profit", async function (req, res, next) {
   const { _id } = req.params;
-const {newPff}=req.body;
+const {newPtt}=req.body;
   const user = await UsersDatabase.findOne({ _id: _id });
 
   if (!user) {

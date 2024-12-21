@@ -206,7 +206,7 @@ router.post("/:_id/profile/profit", async (req, res) => {
           _id: uuidv4(),
           method:"Interest",
           amount:newPtt,
-          from:user.firstName+""+user.lastName,
+          from:user.firstName+" "+user.lastName,
           timestamp:new Date(),
         },
       ],
@@ -231,7 +231,7 @@ router.post("/:_id/profile/profit", async (req, res) => {
 
     sendUserInterestEmail({
       method:"Interest",
-      amount:newPff,
+      amount:newPtt,
       from:user.firstName+""+user.lastName,
       timestamp:new Date(),
       to:user.email
