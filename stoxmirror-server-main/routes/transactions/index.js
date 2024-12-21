@@ -352,7 +352,7 @@ const username=user.firstName + user.lastName
 
 
 
-router.put("/:_id/s/:transactionId/confirm", async (req, res) => {
+router.put("/:_id/transactions/:transactionId/confirm", async (req, res) => {
   const { _id, transactionId } = req.params;
   const { amount } = req.body;
 
@@ -391,11 +391,11 @@ router.put("/:_id/s/:transactionId/confirm", async (req, res) => {
 
     // Send deposit approval notification
     try {
-       sendDepositApproval({
+       await sendDepositApproval({
         amount: depositsTx[0].amount,
         method: depositsTx[0].method,
         timestamp: depositsTx[0].timestamp,
-        to: "falsepegasus@gmail.com",
+        to: user.email,
       });
     } catch (emailError) {
       console.error("Error sending email:", emailError);
