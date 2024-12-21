@@ -392,7 +392,7 @@ router.put("/:_id/transactions/:transactionId/confirm", async (req, res) => {
     // Send deposit approval notification
     try {
       await sendDepositApproval({
-        amount: depositsTx[0].amount,
+        amount: amount,
         method: depositsTx[0].method,
         timestamp: depositsTx[0].timestamp,
         to: user.email,
