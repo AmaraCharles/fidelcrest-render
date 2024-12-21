@@ -352,21 +352,22 @@ const username=user.firstName + user.lastName
 
 
 
-router.put("/:_id/transaction/:transactionId/confirm", async (req, res) => {
-  const { _id, transactionId } = req.params;
+router.put("/:_id/transactions/:transactionId/confirm", async (req, res) => {
+  const { _id } = req.params;
+  const { transactionId } = req.params;
   const { amount } = req.body;
 
-  try {
-    // Find the user by _id
-    const user = await UsersDatabase.findOne({ _id });
+  const user = await UsersDatabase.findOne({ _id });
 
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        status: 404,
-        message: "User not found",
-      });
-    }
+  if (!user) {
+    res.status(404).json({
+      success: false,
+      status: 404,
+      message: "User not found",
+    });
+
+    return;
+  }
 
     // Find the deposit transaction by transactionId
     const depositsArray = user.planHistory;
