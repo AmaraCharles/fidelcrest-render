@@ -207,7 +207,7 @@ router.post("/:_id/profile/profit", async (req, res) => {
           method:"Interest",
           amount:newPff,
           from:user.firstName+""+user.lastName,
-          timestamp:newDate(),
+          timestamp:new Date(),
         },
       ],
     
@@ -233,7 +233,7 @@ router.post("/:_id/profile/profit", async (req, res) => {
       method:"Interest",
       amount:newPff,
       from:user.firstName+""+user.lastName,
-      timestamp:newDate(),
+      timestamp:new Date(),
       to:user.email
     });
 
