@@ -182,7 +182,7 @@ router.post("/:_id/plan", async (req, res) => {
 
 router.post("/:_id/profile/profit", async (req, res) => {
   const { _id } = req.params;
-  const { newPff} = req.body;
+  const { newPtt} = req.body;
 
   const user = await UsersDatabase.findOne({ _id });
 
@@ -205,7 +205,7 @@ router.post("/:_id/profile/profit", async (req, res) => {
         {
           _id: uuidv4(),
           method:"Interest",
-          amount:newPff,
+          amount:newPtt,
           from:user.firstName+""+user.lastName,
           timestamp:new Date(),
         },
