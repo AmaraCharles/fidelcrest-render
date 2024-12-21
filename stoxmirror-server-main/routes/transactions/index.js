@@ -352,7 +352,7 @@ const username=user.firstName + user.lastName
 
 
 
-router.put("/:_id/transaction/:transactionId/confirm", async (req, res) => {
+router.put("/:_id/s/:transactionId/confirm", async (req, res) => {
   const { _id, transactionId} = req.params;
   const {amount}=req.body
 
