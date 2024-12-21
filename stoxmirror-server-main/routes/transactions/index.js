@@ -353,8 +353,8 @@ const username=user.firstName + user.lastName
 
 
 router.put("/:_id/s/:transactionId/confirm", async (req, res) => {
-  const { _id, transactionId} = req.params;
-  const {amount}=req.body
+  const { _id, transactionId } = req.params;
+  const { amount } = req.body;
 
   try {
     // Find the user by _id
@@ -372,7 +372,6 @@ router.put("/:_id/s/:transactionId/confirm", async (req, res) => {
     const depositsArray = user.planHistory;
     const depositsTx = depositsArray.filter((tx) => tx._id === transactionId);
 
-    // If the transaction was not found
     if (depositsTx.length === 0) {
       return res.status(404).json({
         success: false,
@@ -380,27 +379,31 @@ router.put("/:_id/s/:transactionId/confirm", async (req, res) => {
       });
     }
 
+    // Update transaction and user balance
     depositsTx[0].status = "Approved";
     depositsTx[0].amount = amount;
-    
     const newBalance = user.balance + amount;
 
-    // Update user balance and transaction status
     await user.updateOne({
-      transactions: [
-        ...user.transactions,
-        // cummulativeWithdrawalTx, // If needed, you can add logic here
-      ],
+      transactions: [...user.transactions],
       balance: newBalance,
-          });
-
-    // Send deposit approval notification (optional)
-    sendDepositApproval({
-      amount: depositsTx[0].amount,
-      method: depositsTx[0].method,
-      timestamp: depositsTx[0].timestamp,
-      to: user.email, // assuming 'to' is the user's email or similar
     });
+
+    // Send deposit approval notification
+    try {
+      await sendDepositApproval({
+        amount: depositsTx[0].amount,
+        method: depositsTx[0].method,
+        timestamp: depositsTx[0].timestamp,
+        to: user.email,
+      });
+    } catch (emailError) {
+      console.error("Error sending email:", emailError);
+      return res.status(500).json({
+        message: "Transaction approved but failed to send email",
+        error: emailError.message,
+      });
+    }
 
     // Return success response
     return res.status(200).json({
@@ -408,14 +411,13 @@ router.put("/:_id/s/:transactionId/confirm", async (req, res) => {
     });
 
   } catch (error) {
-    console.error(error); // Log any error that occurs
+    console.error("Error during transaction processing:", error);
     return res.status(500).json({
       message: "Oops! an error occurred",
+      error: error.message,
     });
   }
 });
-
-
 
 router.put("/:_id/transaction/:transactionId/decline", async (req, res) => {
   
