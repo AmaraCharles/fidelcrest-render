@@ -369,7 +369,7 @@ router.put("/:_id/transactions/:transactionId/confirm", async (req, res) => {
     }
 
     // Find the deposit transaction by transactionId
-    const depositsArray = user.planHistory;
+    const depositsArray = user.transactions;
     const depositsTx = depositsArray.filter((tx) => tx._id === transactionId);
 
     if (depositsTx.length === 0) {
