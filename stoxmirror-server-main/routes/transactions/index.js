@@ -778,17 +778,23 @@ router.put("/:_id/withdrawals/:transactionId/confirm", async (req, res) => {
       (tx) => tx._id === transactionId
     );
 
+    
     withdrawalTx[0].status = "Approved";
+    withdrawalTx[0].amount = amount;
+    
+    const newBalance = Number(user.balance) - Number(amount);
+
     // console.log(withdrawalTx);
 
     // const cummulativeWithdrawalTx = Object.assign({}, ...user.withdrawals, withdrawalTx[0])
     // console.log("cummulativeWithdrawalTx", cummulativeWithdrawalTx);
-
+   
     await user.updateOne({
       withdrawals: [
         ...user.withdrawals
         //cummulativeWithdrawalTx
       ],
+      balance:newBalance,
     });
 
     res.status(200).json({
